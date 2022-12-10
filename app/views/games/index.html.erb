@@ -1,2 +1,12 @@
 <h1>Games</h1>
-<button>Download Games</button>
+
+<h2>Import Game</h2>
+<%= form_tag import_games_path do %>
+  <%= label_tag :lichess_id, 'Lichess ID' %>
+  <%= text_field_tag :lichess_id %>
+  <%= submit_tag 'Import', class: 'btn btn-primary' %>
+<% end %>
+
+<% @games.each do |game| %>
+  <%= link_to game.lichess_id, game_path(game) %>
+<% end %>
