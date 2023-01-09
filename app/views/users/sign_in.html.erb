@@ -1,0 +1,13 @@
+<h1>Sign In</h1>
+
+<%= form_tag '/users/log_in' do %>
+  <%= collection_select(:existing_user, :user_id, @users, :id, :name) %>
+  <%= button_tag 'log_in' %>
+<% end %>
+
+<%= form_for @user do |f| %>
+  <%= f.label :name %>
+  <%= f.text_field :name %>
+  <%= f.submit %>
+<% end %>
+

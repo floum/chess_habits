@@ -11,6 +11,12 @@
   </head>
 
   <body class="container">
+    <header>
+      <%= current_user.name %>
+      <% unless current_user.new_record? %>
+        <%= button_to 'Sign out', sign_out_path %>
+      <% end %>
+    </header>
     <%= yield %>
   </body>
 </html>
