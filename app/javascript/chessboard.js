@@ -1,10 +1,8 @@
 import { Chessground } from 'chessground';
 
 export class Chessboard {
-  constructor(element, fen, orientation) {
+  constructor(element) {
     this.element = element;
-    this.fen = fen;
-    this.orientation = orientation;
-    this.board = Chessground(this.element, {fen: this.fen, orientation: this.orientation, movable: false});
+    this.board = Chessground(this.element, {movable: true});
   }
 }
