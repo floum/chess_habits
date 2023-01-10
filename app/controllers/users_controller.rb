@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   def sign_in
     if session[:user_id]
-      redirect_to games_path
+      redirect_to training_path
     end
 
     @users = User.all

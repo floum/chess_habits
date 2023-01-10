@@ -10,9 +10,7 @@ Rails.application.routes.draw do
   resources :users, only: [:create] do
   end
 
-  resources :games do
-    post :import, on: :collection
-  end
+  resources :puzzles, only: [:create]
+
   root "users#sign_in"
-  
 end

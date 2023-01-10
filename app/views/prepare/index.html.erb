@@ -1,17 +1,27 @@
 <div class="row">
-  <div class="col-4 offset-2">
+  <div class="col-2">
+    <div id="history">
+    </div>
+  </div>
+  <div class="col-4">
     <div class="row">
       <div id="chessboard"></div>
     </div>
-    <div class="row">
-      <div id="fen">
-        FEN :
-      </div>
-    </div>
+  </div>
+  <div class="col-6">
+    <div id="fen"></div>
+    <%= form_for @puzzle do |f| %>
+      <%= f.text_field :move %>
+      <%= f.hidden_field :fen %>
+      <%= f.submit %>
+    <% end %>
   </div>
 </div>
 
 <script type="module">
   import { Chessboard } from 'chessboard';
-  const game = new Chessboard(document.getElementById('chessboard'));
+  const game = new Chessboard(
+    document.getElementById('chessboard'),
+    document.getElementById('puzzle_fen')
+  );
 </script>

@@ -1,4 +1,5 @@
 class PrepareController < ApplicationController
-  def show
+  def index
+    @puzzle = Puzzle.new(user: current_user)
   end
 end
