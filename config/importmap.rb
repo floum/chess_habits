@@ -7,4 +7,5 @@ pin "@popperjs/core", to: "https://ga.jspm.io/npm:@popperjs/core@2.11.5/lib/inde
 
 pin "chessgame", to: "chessgame.js", preload: true
 pin "chessboard", to: "chessboard.js", preload: true
+pin "puzzle", to: "puzzle.js", preload: true
 pin "chess.js", to: "https://ga.jspm.io/npm:chess.js@0.13.3/chess.js"
