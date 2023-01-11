@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'httparty'
+
+puzzles = YAML.load_file(ARGV[0])
+
+api = 'http://localhost:3000/api/puzzles'
+
+puzzles["puzzles"].each do |puzzle|
+  response = HTTParty.post(api, {
+    headers: { 'Content-Type' => 'application/json' },
+    body: {
+      puzzle:  {
+        "fen" => puzzle["fen"],
+        "move" => puzzle["move"]
+      }
+    }.to_json
+  })
+  p response
+end
