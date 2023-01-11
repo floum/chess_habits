@@ -1,8 +1,13 @@
 <div class="row">
   <div class="col-8 offset-2">
-    <div class="row">
-      <div id="chessboard"></div>
+    <div id="chessboard"></div>
+  </div>
+  <div class="col-2">
+    <div id="solution"></div>
+    <div id="next">
+      <%= link_to 'Next', root_path %>
     </div>
+    <%= check_box_tag 'auto' %>Auto Next
   </div>
 </div>
 
@@ -16,5 +21,6 @@
       "color": "<%= @puzzle.color %>"
     },
     document.getElementById('chessboard'),
+    document.getElementById('solution')
   );
 </script>

@@ -12,5 +12,9 @@ Rails.application.routes.draw do
 
   resources :puzzles, only: [:create]
 
+  namespace :api, defaults: { format: :json } do
+    resources :puzzles
+  end
+
   root "users#sign_in"
 end
