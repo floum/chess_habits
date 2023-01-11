@@ -5,6 +5,7 @@ export class Puzzle {
   constructor(puzzle, element) {
     this.puzzle = puzzle;
     this.config = {
+      orientation: this.puzzle.color,
       fen: this.puzzle.fen,
       movable: {
 	events: {
@@ -23,7 +24,7 @@ export class Puzzle {
     this.board = Chessground(this.element, this.config);
     this.game = new Chess(puzzle.fen);
     this.move = puzzle.move;
-	  console.log(puzzle);
+    console.log(puzzle);
   }
 
   checkAnswer(move) {
