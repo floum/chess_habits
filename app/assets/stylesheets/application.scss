@@ -34,6 +34,14 @@ body {
   color: var(--bs-light);
 }
 
+.puzzle-success {
+  border: solid 12px green;
+}
+
+.puzzle-failure {
+  border: solid 12px red;
+}
+
 .game__navbar {
   text-align: center;
 }

@@ -31,8 +31,10 @@ export class Puzzle {
 	checkAnswer(move) {
 		if (this.move == move.san) {
 			this.solutionElement.append(this.successDiv());
+      this.element.classList.add("puzzle-success");
 		} else {
 			this.solutionElement.append(this.failureDiv());
+      this.element.classList.add("puzzle-failure");
 		}
 
 		setTimeout(() => { location.reload(); }, 800);
