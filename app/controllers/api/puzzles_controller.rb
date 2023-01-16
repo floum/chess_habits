@@ -2,13 +2,22 @@ module Api
   class PuzzlesController < ActionController::API
     def create
       @puzzle = Puzzle.new(puzzle_params)
-      @puzzle.user = User.first
+      @puzzle.user = User.find_by(params[:username])
 
       if @puzzle.save
         head 201
       else
         render json: @puzzle.errors, status: 400
       end
+    end
+
+    def update
+      @puzzle = Puzzle.find(params[:id])
+      @puzzle.tries += 1
+      @puzzle.successes += 1 if params[:success]
+
+      @puzzle.save
+      render json: @puzzle
     end
 
     private

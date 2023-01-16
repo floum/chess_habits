@@ -1,6 +1,8 @@
 <div class="row">
   <div class="col-8 offset-2">
-    <div id="chessboard"></div>
+    <div id="chessboard-wrap">
+      <div id="chessboard"></div>
+    </div>
   </div>
   <div class="col-2">
     <div id="solution"></div>
@@ -18,7 +20,8 @@
     {
       "fen": "<%= @puzzle.fen %>",
       "move": "<%= @puzzle.move %>",
-      "color": "<%= @puzzle.color %>"
+      "color": "<%= @puzzle.color %>",
+      "id": "<%= @puzzle.id %>"
     },
     document.getElementById('chessboard'),
     document.getElementById('solution')

@@ -34,12 +34,16 @@ body {
   color: var(--bs-light);
 }
 
+#chessboard-wrap {
+  border: solid 12px transparent;
+}
+
 .puzzle-success {
-  border: solid 12px green;
+  border: solid 12px green !important;
 }
 
 .puzzle-failure {
-  border: solid 12px red;
+  border: solid 12px red !important;
 }
 
 .game__navbar {

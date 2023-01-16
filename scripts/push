@@ -2,20 +2,40 @@
 
 require 'yaml'
 require 'httparty'
+require 'thor'
 
-puzzles = YAML.load_file(ARGV[0])
 
-api = 'http://localhost:3000/api/puzzles'
+API = 'http://localhost:3000/api/puzzles'
 
-puzzles["puzzles"].each do |puzzle|
-  response = HTTParty.post(api, {
-    headers: { 'Content-Type' => 'application/json' },
-    body: {
-      puzzle:  {
-        "fen" => puzzle["fen"],
-        "move" => puzzle["move"]
-      }
-    }.to_json
-  })
-  p response
+class ChessHabitsAPI
+  def self.post_puzzle(username, puzzle)
+    response = HTTParty.post(API, {
+      headers: { 'Content-Type' => 'application/json' },
+      body: {
+        puzzle:  {
+          "fen" => puzzle["fen"],
+          "move" => puzzle["move"],
+          "username" => username
+        }
+      }.to_json
+    })
+    response
+  end
 end
+
+class ChessHabitsCLI < Thor
+  desc "puzzles FILE", "create puzzles from FILE"
+  option :username, required: true
+  def puzzles(puzzles_file)
+    puzzles = YAML.load_file(puzzles_file)
+
+    puzzles.each do |puzzle|
+      ChessHabitsAPI.post_puzzle(options[:username], puzzle)
+    end
+  end
+
+end
+
+ChessHabitsCLI.start(ARGV)
+
+

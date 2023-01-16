@@ -29,15 +29,26 @@ export class Puzzle {
 	}
 
 	checkAnswer(move) {
+    let success = false;
 		if (this.move == move.san) {
 			this.solutionElement.append(this.successDiv());
-      this.element.classList.add("puzzle-success");
+      document.getElementById('chessboard-wrap').classList.add("puzzle-success");
+      success = true;
 		} else {
 			this.solutionElement.append(this.failureDiv());
-      this.element.classList.add("puzzle-failure");
+      document.getElementById('chessboard-wrap').classList.add("puzzle-failure");
 		}
 
-		setTimeout(() => { location.reload(); }, 800);
+    fetch('http://192.168.1.18:3000/api/puzzles/' + this.puzzle.id, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ "success": success })
+    }).then(response => response.json()).then(response => console.log(JSON.stringify(response)));
+
+		setTimeout(() => { location.reload(); }, 300);
 	}
 
 	successDiv() {
