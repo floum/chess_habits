@@ -2,7 +2,8 @@ module Api
   class PuzzlesController < ActionController::API
     def create
       @puzzle = Puzzle.new(puzzle_params)
-      @puzzle.user = User.find_by(params[:username])
+      p params[:username]
+      @puzzle.user = User.find_by(name: params[:username])
 
       if @puzzle.save
         head 201

@@ -1,0 +1,90 @@
+#!/usr/bin/env ruby
+
+require 'yaml'
+require 'httparty'
+require 'thor'
+require 'pgn'
+require 'stockfish'
+
+require 'debug'
+
+
+DEPTH = 4
+API = 'http://localhost:3000/api/puzzles'
+
+class ChessHabitsAPI
+  def self.post_puzzle(username, puzzle)
+    response = HTTParty.post(API, {
+      headers: { 'Content-Type' => 'application/json' },
+      body: {
+        username: username,
+        puzzle:  {
+          "fen" => puzzle["fen"],
+          "move" => puzzle["move"]
+        }
+      }.to_json
+    })
+    response
+  end
+
+  def self.fetch_game(lichess_id)
+    response = HTTParty.get("https://lichess.org/game/export/#{lichess_id[0..7]}")
+    game = PGN.parse(response.body).first
+  end
+end
+
+class ChessHabitsCLI < Thor
+  desc "puzzles FILE", "create puzzles from FILE"
+  option :username, required: true
+  def puzzles(puzzles_file)
+    puzzles = YAML.load_file(puzzles_file)
+
+    puzzles["puzzles"].each do |puzzle|
+      ChessHabitsAPI.post_puzzle(options[:username], puzzle)
+    end
+  end
+
+  desc "analyze FEN_ID", "analyze fen from the API"
+  def analyze
+
+  end
+
+  desc "candidates LICHESS_ID", "find candidates in game LICHESS_ID"
+  def candidates(lichess_id)
+    game = ChessHabitsAPI.fetch_game(lichess_id)
+
+    moves = game.moves.map(&:notation)
+    fens = game.fen_list
+
+    analysis = moves.zip(fens.each_cons(2)).map do |move, (initial_fen, resulting_fen)|
+      initial_evaluation = Stockfish.analyze(initial_fen, depth: DEPTH, multipv: 2)
+
+      scores = initial_evaluation[:variations].map { |var| var[:score] }
+
+      criticality = (scores[0] - scores[1]).abs
+      initial_score = scores.max
+      
+      resulting_evaluation = Stockfish.analyze(resulting_fen, depth: DEPTH)
+
+      move_score = initial_score + resulting_evaluation[:variations].first[:score]
+
+      data = {
+        criticality: criticality,
+        fen: initial_fen,
+        move_score: move_score,
+        move: move
+      }
+      data
+    end
+
+    debugger
+
+    candidates = analysis.select do |analysis|
+      analysis[:criticality] > 3 && analysis[:move_score].abs > 2
+    end
+    p candidates
+  end
+end
+
+ChessHabitsCLI.start(ARGV)
+
