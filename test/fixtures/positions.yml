@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  fen_board: MyString
+  fen_castling: MyString
+  en_passant: MyString
+  active_color: MyString
+
+two:
+  fen_board: MyString
+  fen_castling: MyString
+  en_passant: MyString
+  active_color: MyString

@@ -10,11 +10,19 @@ require 'debug'
 
 
 DEPTH = 4
-API = 'http://localhost:3000/api/puzzles'
+API = 'http://localhost:3000/api'
 
 class ChessHabitsAPI
+  def self.analysis
+    response = HTTParty.get(
+      API + '/analysis',
+      headers: { 'Content-Type' => 'application/json' }
+    )
+    JSON.parse(response.body)
+  end
+
   def self.post_puzzle(username, puzzle)
-    response = HTTParty.post(API, {
+    response = HTTParty.post(API + '/puzzles', {
       headers: { 'Content-Type' => 'application/json' },
       body: {
         username: username,
@@ -23,6 +31,14 @@ class ChessHabitsAPI
           "move" => puzzle["move"]
         }
       }.to_json
+    })
+    response
+  end
+
+  def self.post_analysis(analysis)
+    response = HTTParty.post(API + '/analyses', {
+      headers: { 'Content-Type' => 'application/json' },
+      body: analysis.to_json
     })
     response
   end
@@ -44,9 +60,35 @@ class ChessHabitsCLI < Thor
     end
   end
 
-  desc "analyze FEN_ID", "analyze fen from the API"
+  desc "analyze", "analyze a fen from the API"
+  option :depth, default: DEPTH, type: :numeric
   def analyze
+    position = ChessHabitsAPI.analysis
 
+    unless position
+      p "Nothing to analyze"
+      exit
+    end
+    
+    stockfish_analysis = Stockfish.analyze(position["fen"], depth: options[:depth])
+
+    if stockfish_analysis[:variations].first[:score].start_with?('mate')
+      score = 150
+      if position["active_color"] == 'b'
+        score *= -1
+      end
+    else
+      score = stockfish_analysis[:variations].first[:score]
+    end
+
+    analysis = {
+      depth: options[:depth],
+      score: score,
+      best_move: stockfish_analysis[:bestmove],
+      position_id: position["id"]
+    }
+
+    p ChessHabitsAPI.post_analysis(analysis)
   end
 
   desc "candidates LICHESS_ID", "find candidates in game LICHESS_ID"

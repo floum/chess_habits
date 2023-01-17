@@ -1,0 +1,11 @@
+- Position:
+  fen_board: string
+  fen_castling: string
+  en_passant: string *nullable
+  active_color: string
+
+- Analysis:
+  position_id: integer
+  depth: integer
+  score: float
+

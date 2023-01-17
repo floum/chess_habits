@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  best_move: MyString
+  position: one
+  score: 1.5
+
+two:
+  best_move: MyString
+  position: two
+  score: 1.5

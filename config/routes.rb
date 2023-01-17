@@ -14,6 +14,8 @@ Rails.application.routes.draw do
 
   namespace :api, defaults: { format: :json } do
     resources :puzzles
+    get '/analysis', to: 'positions#analyze', as: :analysis
+    post '/analyses', to: 'analyses#create'
   end
 
   root "users#sign_in"
