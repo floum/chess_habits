@@ -12,6 +12,6 @@ class Api::AnalysesController < ActionController::API
   private
 
   def analysis_params
-    params.permit(:depth, :score, :best_move, :position_id)
+    params.permit(:depth, :score, :best_move, :criticality, :position_id)
   end
 end

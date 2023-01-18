@@ -68,21 +68,18 @@ class ChessHabitsCLI < Thor
       exit
     end
 
-    stockfish_analysis = Stockfish.analyze(position['fen'], depth: options[:depth])
-    score = 0
+    stockfish_analysis = Stockfish.analyze(position['fen'], depth: options[:depth], multipv: 2)
+    scores = stockfish_analysis[:variations].map {|var| var[:score]}
+    scores.map! {|s| s.class == String ? 150 : s}
 
-    if stockfish_analysis[:variations].first[:score].start_with?('mate')
-      score = 150
-      score *= -1 if position['active_color'] == 'b'
-    else
-      score = stockfish_analysis[:variations].first[:score]
-    end
+    criticality = (scores[0] - scores[1]).abs
 
     analysis = {
       depth: options[:depth],
-      score:,
+      score: scores.max,
       best_move: stockfish_analysis[:bestmove],
-      position_id: position['id']
+      position_id: position['id'],
+      criticality: criticality
     }
 
     p ChessHabitsAPI.post_analysis(analysis)

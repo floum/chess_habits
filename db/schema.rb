@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_17_155524) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_17_162342) do
   create_table "analyses", force: :cascade do |t|
     t.string "best_move"
     t.integer "position_id", null: false
@@ -18,6 +18,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_17_155524) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "depth"
+    t.float "criticality"
     t.index ["position_id"], name: "index_analyses_on_position_id"
   end
 
