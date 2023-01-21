@@ -10,17 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_17_162342) do
-  create_table "analyses", force: :cascade do |t|
-    t.string "best_move"
-    t.integer "position_id", null: false
-    t.float "score"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.integer "depth"
-    t.float "criticality"
-    t.index ["position_id"], name: "index_analyses_on_position_id"
-  end
+ActiveRecord::Schema[7.0].define(version: 2023_01_18_234134) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "plpgsql"
 
   create_table "games", force: :cascade do |t|
     t.string "pgn"
@@ -30,8 +22,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_17_162342) do
     t.boolean "reviewed"
   end
 
+  create_table "moves", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "position_id", null: false
+    t.string "move"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "puzzle"
+    t.index ["position_id"], name: "index_moves_on_position_id"
+    t.index ["user_id"], name: "index_moves_on_user_id"
+  end
+
   create_table "position_labels", force: :cascade do |t|
-    t.integer "position_id", null: false
+    t.bigint "position_id", null: false
     t.integer "label_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -39,18 +42,19 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_17_162342) do
   end
 
   create_table "positions", force: :cascade do |t|
-    t.string "fen_board"
-    t.string "fen_castling"
-    t.string "en_passant"
-    t.string "active_color"
+    t.string "fen"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "depth"
+    t.float "score"
+    t.string "best_move"
+    t.float "criticality"
   end
 
   create_table "puzzles", force: :cascade do |t|
     t.string "fen"
     t.string "move"
-    t.integer "user_id", null: false
+    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "successes"
@@ -64,7 +68,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_17_162342) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "analyses", "positions"
+  add_foreign_key "moves", "positions"
+  add_foreign_key "moves", "users"
   add_foreign_key "position_labels", "positions"
   add_foreign_key "puzzles", "users"
 end

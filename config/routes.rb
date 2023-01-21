@@ -16,6 +16,9 @@ Rails.application.routes.draw do
     resources :puzzles
     get '/analysis', to: 'positions#analyze', as: :analysis
     post '/analyses', to: 'analyses#create'
+    get '/users/:name', to: 'users#show'
+    resources :positions
+    resources :moves
   end
 
   root "users#sign_in"
