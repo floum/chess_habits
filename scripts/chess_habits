@@ -1,15 +1,15 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+require 'debug'
+
 require 'yaml'
 require 'httparty'
 require 'thor'
 require 'chess'
 require 'stockfish'
 
-require 'debug'
-
-DEPTH = 12
+DEPTH = 18
 API = 'http://localhost:3000/api'
 
 class ChessHabitsAPI
@@ -23,22 +23,25 @@ class ChessHabitsAPI
 
   def self.post_puzzle(username, puzzle)
     HTTParty.post("#{API}/puzzles", {
-                    headers: { 'Content-Type' => 'application/json' },
-                    body: {
-                      username:,
-                      puzzle: {
-                        'fen' => puzzle['fen'],
-                        'move' => puzzle['move']
-                      }
-                    }.to_json
-                  })
+      headers: { 'Content-Type' => 'application/json' },
+      body: {
+        username:,
+        puzzle: {
+          'fen' => puzzle['fen'],
+          'move' => puzzle['move']
+        }
+      }.to_json
+    })
+    throw :api_error unless response.ok?
   end
 
   def self.post_analysis(position_id, analysis)
-    HTTParty.put("#{API}/positions/#{position_id}", {
-                    headers: { 'Content-Type' => 'application/json' },
-                    body: analysis.to_json
-                  })
+    response = HTTParty.put("#{API}/positions/#{position_id}", {
+      headers: { 'Content-Type' => 'application/json' },
+        body: analysis.to_json
+    })
+    throw :api_error unless response.ok?
+    JSON.parse(response.body)
   end
 
   def self.fetch_game(lichess_id)
@@ -49,36 +52,46 @@ class ChessHabitsAPI
         'Accept' => 'application/json'
       }
     )
+    throw :lichess_error unless response.ok?
     JSON.parse(response.body)
+  end
+
+  def self.fetch_games(username, options={})
+    response = HTTParty.get(
+      "https://lichess.org/api/games/user/#{username}?max=100"
+    )
+    response.body
   end
 
   def self.get_player_id(username)
     response = HTTParty.get("#{API}/users/#{username}")
 
+    throw :api_error unless response.ok?
     JSON.parse(response.body)["id"]
   end
 
   def self.create_position(fen)
     response = HTTParty.post("#{API}/positions", {
-                    headers: { 'Content-Type' => 'application/json' },
-                    body: {
-                      fen:
-                    }.to_json
-                  })
+      headers: { 'Content-Type' => 'application/json' },
+      body: {
+        fen:
+      }.to_json
+    })
+    throw :api_error unless response.ok?
     JSON.parse(response.body)
   end
 
   def self.create_move(player_id, position_id, move)
     response = HTTParty.post("#{API}/moves", {
-                    headers: { 'Content-Type' => 'application/json' },
-                    body: {
-                      user_id: player_id,
-                      position_id:,
-                      move:
-                    }.to_json
-                  })
+      headers: { 'Content-Type' => 'application/json' },
+      body: {
+        user_id: player_id,
+        position_id:,
+        move:
+      }.to_json
+    })
+    throw :api_error unless response.ok?
     JSON.parse(response.body)
-
   end
 end
 
@@ -93,33 +106,39 @@ class ChessHabitsCLI < Thor
     end
   end
 
-  desc 'import LICHESS_ID', 'import game from Lichess.org'
+  desc 'import FILE', 'import game from Lichess.org, one ID per line in FILE'
   option :username, required: true
-  def import(lichess_id)
-    game = ChessHabitsAPI.fetch_game(lichess_id)
+  def import(file)
+    game_ids = File.readlines(file)
 
-    player_id = ChessHabitsAPI.get_player_id(options[:username])
+    game_ids.each do |lichess_id|
+      game = ChessHabitsAPI.fetch_game(lichess_id.strip)
 
-    if game["players"]["white"]["user"]["name"] == options[:username]
-      player_index = 0
-    end
+      player_id = ChessHabitsAPI.get_player_id(options[:username])
 
-    if game["players"]["black"]["user"]["name"] == options[:username]
-      player_index = 1
-    end
+      if game["players"]["white"]["user"]["name"] == options[:username]
+        player_index = 0
+      end
 
-    throw :player_not_found unless player_index
+      if game["players"]["black"]["user"]["name"] == options[:username]
+        player_index = 1
+      end
 
-    cgame = Chess::Game.new
+      throw :player_not_found unless player_index
 
-    game["moves"].split(' ').each_with_index do |move, index|
-      fen = cgame.board.to_fen
-      cgame.move(move)
-      uci = cgame.coord_moves.last
+      cgame = Chess::Game.new
 
-      if index % 2 == player_index
-        position = ChessHabitsAPI.create_position(fen)
-        ChessHabitsAPI.create_move(player_id, position["id"], uci)
+      game["moves"].split(' ').each_with_index do |move, index|
+        fen = cgame.board.to_fen
+        cgame.move(move)
+        uci = cgame.coord_moves.last
+
+        if index % 2 == player_index
+          position = ChessHabitsAPI.create_position(fen)
+          catch :api_error do
+            ChessHabitsAPI.create_move(player_id, position["id"], uci)
+          end
+        end
       end
     end
 
@@ -127,28 +146,45 @@ class ChessHabitsCLI < Thor
 
   desc 'analyze', 'analyze a fen from the API'
   option :depth, default: DEPTH, type: :numeric
+  option :size, default: 1, type: :numeric
   def analyze
-    position = ChessHabitsAPI.analysis
+    options[:size].times do
+      position = ChessHabitsAPI.analysis
 
-    unless position
-      p 'Nothing to analyze'
-      exit
+      unless position
+        p 'Nothing to analyze'
+        exit
+      end
+
+      stockfish_analysis = Stockfish.analyze(position['fen'], depth: options[:depth], multipv: 2)
+      scores = stockfish_analysis[:variations].map {|var| var[:score]}
+      scores.map! {|s| s.class == String ? 150 : s}
+
+      if scores.size == 2
+        criticality = (scores[0] - scores[1]).abs
+      else
+        criticality = 0
+      end
+
+      analysis = {
+        depth: options[:depth],
+        score: scores.max,
+        best_move: stockfish_analysis[:bestmove],
+        criticality: criticality
+      }
+
+      p ChessHabitsAPI.post_analysis(position['id'], analysis)
     end
+  end
 
-    stockfish_analysis = Stockfish.analyze(position['fen'], depth: options[:depth], multipv: 2)
-    scores = stockfish_analysis[:variations].map {|var| var[:score]}
-    scores.map! {|s| s.class == String ? 150 : s}
+  desc 'games USERNAME', 'download games for lichess USERNAME'
+  option :size, default: 50, type: :numeric
+  def games(username)
+    games = ChessHabitsAPI.fetch_games(username, options)
 
-    criticality = (scores[0] - scores[1]).abs
-
-    analysis = {
-      depth: options[:depth],
-      score: scores.max,
-      best_move: stockfish_analysis[:bestmove],
-      criticality: criticality
-    }
-
-    p ChessHabitsAPI.post_analysis(position['id'], analysis)
+    games.scan(/https:\/\/lichess.org\/(\w+)/).each do |match|
+      puts match[0]
+    end
   end
 end
 

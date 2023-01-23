@@ -16,7 +16,7 @@ module Api
 
       @position.update(position_params)
       if @position.save
-        head 201
+        render json: @position, status: :ok
       else
         render json: @position.errors, status: :bad_request
       end
@@ -24,7 +24,7 @@ module Api
 
     def analyze
       @position = Position.where(depth: Position.minimum(:depth)).first
-      render json: @position
+      render json: @position, include: :moves
     end
 
     def position_params

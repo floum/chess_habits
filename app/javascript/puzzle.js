@@ -2,8 +2,7 @@ import { Chessground } from 'chessground';
 import { Chess } from 'chess.js';
 
 export class Puzzle {
-	constructor(puzzle, element, solutionElement) {
-		this.solutionElement = solutionElement;
+	constructor(puzzle, element) {
 		this.puzzle = puzzle;
 		this.config = {
 			orientation: this.puzzle.color,
@@ -30,12 +29,10 @@ export class Puzzle {
 
 	checkAnswer(move) {
     let success = false;
-		if (this.move == move.san) {
-			this.solutionElement.append(this.successDiv());
+		if (this.move == move.from + move.to) {
       document.getElementById('chessboard-wrap').classList.add("puzzle-success");
       success = true;
 		} else {
-			this.solutionElement.append(this.failureDiv());
       document.getElementById('chessboard-wrap').classList.add("puzzle-failure");
 		}
 

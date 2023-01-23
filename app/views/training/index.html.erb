@@ -4,14 +4,9 @@
       <div id="chessboard"></div>
     </div>
   </div>
-  <div class="col-2 d-none">
-    <div id="solution"></div>
-    <div id="next">
-      <%= link_to 'Next', root_path %>
-    </div>
-    <%= check_box_tag 'auto' %>Auto Next
-  </div>
 </div>
+<div class="row">
+  <%= link_to 'View on lichess', "https://lichess.org/analysis/fromPosition/#{@puzzle.fen}" %>
 
 <script type="module">
   import { Puzzle } from 'puzzle';
@@ -23,7 +18,6 @@
       "color": "<%= @puzzle.color %>",
       "id": "<%= @puzzle.id %>"
     },
-    document.getElementById('chessboard'),
-    document.getElementById('solution')
+    document.getElementById('chessboard')
   );
 </script>

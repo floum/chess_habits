@@ -1,22 +1,19 @@
 class Puzzle < ApplicationRecord
-  after_initialize :init_tries
-  after_initialize :init_successes
+  attribute :tries, :integer, default: 0
+  attribute :successes, :integer, default: 0
 
   belongs_to :user
+  belongs_to :position
 
-  validates_presence_of :fen
-  validates_presence_of :move
-  validates_uniqueness_of :fen, scope: :user
+  validates_uniqueness_of :position, scope: :user
 
   def color
-    fen.split(" ")[1] == 'w' ? 'white' : 'black'
+    position.fen.split(" ")[1] == 'w' ? 'white' : 'black'
   end
 
-  def init_tries
-    self.tries ||= 0
-  end
+  delegate :fen, to: :position
 
-  def init_successes
-    self.successes ||= 0
+  def move
+    position.best_move
   end
 end

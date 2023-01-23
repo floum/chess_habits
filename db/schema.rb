@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_18_234134) do
+ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -28,7 +28,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_18_234134) do
     t.string "move"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.boolean "puzzle"
     t.index ["position_id"], name: "index_moves_on_position_id"
     t.index ["user_id"], name: "index_moves_on_user_id"
   end
@@ -52,13 +51,13 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_18_234134) do
   end
 
   create_table "puzzles", force: :cascade do |t|
-    t.string "fen"
-    t.string "move"
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "successes"
     t.integer "tries"
+    t.bigint "position_id", null: false
+    t.index ["position_id"], name: "index_puzzles_on_position_id"
     t.index ["user_id"], name: "index_puzzles_on_user_id"
   end
 
@@ -71,5 +70,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_18_234134) do
   add_foreign_key "moves", "positions"
   add_foreign_key "moves", "users"
   add_foreign_key "position_labels", "positions"
+  add_foreign_key "puzzles", "positions"
   add_foreign_key "puzzles", "users"
 end

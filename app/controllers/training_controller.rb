@@ -3,7 +3,7 @@ class TrainingController < ApplicationController
     @user = current_user
     @puzzle = Puzzle.where(user: current_user)
       .order("RANDOM()")
-      .first(50)
+      .first(15)
       .sort_by{ |puzzle| [puzzle.successes, puzzle.tries, puzzle.updated_at] }
       .first
   end
