@@ -10,9 +10,17 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
-  # These are extensions that must be enabled in order to support this database
-  enable_extension "plpgsql"
+ActiveRecord::Schema[7.0].define(version: 2023_01_24_101038) do
+  create_table "analyses", force: :cascade do |t|
+    t.string "best_move"
+    t.integer "position_id", null: false
+    t.float "score"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "depth"
+    t.float "criticality"
+    t.index ["position_id"], name: "index_analyses_on_position_id"
+  end
 
   create_table "games", force: :cascade do |t|
     t.string "pgn"
@@ -20,20 +28,23 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
     t.datetime "updated_at", null: false
     t.string "lichess_id"
     t.boolean "reviewed"
+    t.integer "user_id", null: false
+    t.index ["user_id"], name: "index_games_on_user_id"
   end
 
   create_table "moves", force: :cascade do |t|
-    t.bigint "user_id", null: false
-    t.bigint "position_id", null: false
+    t.integer "position_id", null: false
     t.string "move"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "puzzle_check"
+    t.integer "game_id", null: false
+    t.index ["game_id"], name: "index_moves_on_game_id"
     t.index ["position_id"], name: "index_moves_on_position_id"
-    t.index ["user_id"], name: "index_moves_on_user_id"
   end
 
   create_table "position_labels", force: :cascade do |t|
-    t.bigint "position_id", null: false
+    t.integer "position_id", null: false
     t.integer "label_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -41,7 +52,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
   end
 
   create_table "positions", force: :cascade do |t|
-    t.string "fen"
+    t.string "fen_board"
+    t.string "fen_castling"
+    t.string "en_passant"
+    t.string "active_color"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "depth"
@@ -51,12 +65,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
   end
 
   create_table "puzzles", force: :cascade do |t|
-    t.bigint "user_id", null: false
+    t.integer "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "successes"
     t.integer "tries"
-    t.bigint "position_id", null: false
+    t.integer "position_id", null: false
     t.index ["position_id"], name: "index_puzzles_on_position_id"
     t.index ["user_id"], name: "index_puzzles_on_user_id"
   end
@@ -67,8 +81,10 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
     t.datetime "updated_at", null: false
   end
 
+  add_foreign_key "analyses", "positions"
+  add_foreign_key "games", "users"
+  add_foreign_key "moves", "games"
   add_foreign_key "moves", "positions"
-  add_foreign_key "moves", "users"
   add_foreign_key "position_labels", "positions"
   add_foreign_key "puzzles", "positions"
   add_foreign_key "puzzles", "users"
