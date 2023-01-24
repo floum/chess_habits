@@ -44,6 +44,18 @@ class ChessHabitsAPI
     JSON.parse(response.body)
   end
 
+  def self.create_game(lichess_id, user_id)
+    response = HTTParty.post(
+      "#{API}/games",
+      headers: { 'Content-Type' => 'application/json' },
+        body: {
+          lichess_id: ,
+          user_id:
+        }.to_json
+    )
+    JSON.parse(response.body)
+  end
+
   def self.fetch_game(lichess_id)
     response = HTTParty.get(
       "https://lichess.org/game/export/#{lichess_id[0..7]}",
@@ -81,11 +93,11 @@ class ChessHabitsAPI
     JSON.parse(response.body)
   end
 
-  def self.create_move(player_id, position_id, move)
+  def self.create_move(game_id, position_id, move)
     response = HTTParty.post("#{API}/moves", {
       headers: { 'Content-Type' => 'application/json' },
       body: {
-        user_id: player_id,
+        game_id: ,
         position_id:,
         move:
       }.to_json
@@ -116,6 +128,8 @@ class ChessHabitsCLI < Thor
 
       player_id = ChessHabitsAPI.get_player_id(options[:username])
 
+      game_id = ChessHabitsAPI.create_game(lichess_id.strip, player_id)["id"]
+
       if game["players"]["white"]["user"]["name"] == options[:username]
         player_index = 0
       end
@@ -136,7 +150,7 @@ class ChessHabitsCLI < Thor
         if index % 2 == player_index
           position = ChessHabitsAPI.create_position(fen)
           catch :api_error do
-            ChessHabitsAPI.create_move(player_id, position["id"], uci)
+            ChessHabitsAPI.create_move(game_id, position["id"], uci)
           end
         end
       end

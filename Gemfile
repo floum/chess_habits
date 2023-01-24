@@ -12,6 +12,9 @@ gem "sprockets-rails"
 gem "pg"
 gem 'sqlite3'
 
+gem 'httparty'
+gem 'stockfish'
+
 
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 5.0"

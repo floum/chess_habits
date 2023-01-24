@@ -52,10 +52,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_24_101038) do
   end
 
   create_table "positions", force: :cascade do |t|
-    t.string "fen_board"
-    t.string "fen_castling"
-    t.string "en_passant"
-    t.string "active_color"
+    t.string "fen", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "depth"

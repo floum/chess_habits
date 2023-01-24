@@ -12,7 +12,7 @@ module Api
     private
 
     def move_params
-      params.permit(:user_id, :position_id, :move)
+      params.permit(:game_id, :position_id, :move)
     end
   end
 end
