@@ -10,7 +10,7 @@ export class Puzzle {
 			movable: {
 				events: {
 					after: (src, dest, metadata) => {
-						let move = this.game.move({ from: src, to: dest});
+						let move = this.game.move({ from: src, to: dest, promotion: 'q' });
 						let fen = this.game.fen();
 						this.board.set({fen: fen});
 						if (move) {
@@ -29,9 +29,10 @@ export class Puzzle {
 
 	checkAnswer(move) {
     let success = false;
-		if (this.move == move.from + move.to) {
+		if (this.move.substring(0, 4) == move.from + move.to) {
       document.getElementById('chessboard-wrap').classList.add("puzzle-success");
       success = true;
+		  setTimeout(() => { location.reload(); }, 300);
 		} else {
       document.getElementById('chessboard-wrap').classList.add("puzzle-failure");
 		}
@@ -45,7 +46,6 @@ export class Puzzle {
       body: JSON.stringify({ "success": success })
     }).then(response => response.json()).then(response => console.log(JSON.stringify(response)));
 
-		setTimeout(() => { location.reload(); }, 300);
 	}
 
 	successDiv() {

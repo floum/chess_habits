@@ -1,6 +1,7 @@
 class TrainingController < ApplicationController
   def index
     @user = current_user
+    redirect_to root_path if @user.new_record?
     @puzzle = Puzzle.where(user: current_user)
       .order("RANDOM()")
       .first(15)
