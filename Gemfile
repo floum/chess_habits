@@ -11,6 +11,8 @@ gem 'bootstrap'
 gem "sprockets-rails"
 gem "pg"
 gem 'sqlite3'
+gem 'chess'
+gem 'httparty'
 
 
 # Use the Puma web server [https://github.com/puma/puma]

@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   
   get '/training', to: 'training#index', as: :training
-  get '/prepare', to: 'prepare#index', as: :preparation
+  get '/prep', to: 'prepare#index', as: :preparation
+  post '/prep', to: 'prepare#import'
   post '/sign_out', as: :sign_out, to: 'users#sign_out'
   post '/users/log_in', to: 'users#log_in'
   resources :users, only: [:create] do

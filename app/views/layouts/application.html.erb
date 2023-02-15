@@ -13,10 +13,18 @@
   <body class="container">
     <header>
       <div class="row">
+      <div class="col-3">
       <%= current_user.name %>
       <% unless current_user.new_record? %>
         <%= button_to 'Sign out', sign_out_path %>
       <% end %>
+      </div>
+      </div>
+      <div class="col-3">
+        <%= link_to 'Train', training_path %>
+      </div>
+      <div class="col-3">
+        <%= link_to 'Prep', preparation_path %>
       </div>
     </header>
     <%= yield %>

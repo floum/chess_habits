@@ -2,7 +2,7 @@ import { Chessground } from 'chessground';
 import { Chess } from 'chess.js';
 
 export class Chessboard {
-  constructor(element, fenElement) {
+  constructor(element) {
     this.config = {
       movable: {
 	events: {
@@ -18,7 +18,5 @@ export class Chessboard {
     this.element = element;
     this.board = Chessground(this.element, this.config);
     this.game = new Chess();
-    this.fenElement = fenElement;
-    this.fenElement.value = this.game.fen();
   }
 }

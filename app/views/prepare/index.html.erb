@@ -8,20 +8,16 @@
       <div id="chessboard"></div>
     </div>
   </div>
-  <div class="col-6">
-    <div id="fen"></div>
-    <%= form_for @puzzle do |f| %>
-      <%= f.text_field :move %>
-      <%= f.hidden_field :fen %>
-      <%= f.submit %>
-    <% end %>
-  </div>
+  <%= form_tag do %>
+    Lichess ID
+    <%= text_field_tag :lichess_id %>
+    <%= submit_tag 'Import Game' %>
+  <% end %>
 </div>
 
 <script type="module">
   import { Chessboard } from 'chessboard';
   const game = new Chessboard(
-    document.getElementById('chessboard'),
-    document.getElementById('puzzle_fen')
+    document.getElementById('chessboard')
   );
 </script>
