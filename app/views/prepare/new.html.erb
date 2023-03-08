@@ -1,0 +1,33 @@
+<div class="row">
+  <div class="col-4">
+    <div class="row">
+      <div id="chessboard"></div>
+    </div>
+  </div>
+  <div class="offset-1 col-5">
+    <h2>New Repertoire Move</h2>
+    <div>
+    <%= form_for @repertoire_move do |f| %>
+      <%= f.label :move %>
+      <%= f.text_field :move %>
+      <%= f.hidden_field :position_id, value: @repertoire_move.position_id %>
+
+      <%= f.submit %>
+    <% end %>
+    </div>
+      <%= link_to 'View on lichess', "https://lichess.org/analysis/fromPosition/#{@repertoire_move.fen}", target: '_blank' %>
+  </div>
+
+</div>
+
+<script type="module">
+  import { Chessboard } from 'chessboard';
+  const config = {
+    fen: '<%= @repertoire_move.fen %>',
+    orientation: '<%= @repertoire_move.color %>'
+    };
+  const game = new Chessboard(
+    document.getElementById('chessboard'),
+    config
+  );
+</script>

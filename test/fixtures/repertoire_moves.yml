@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  user: one
+  opening: one
+  position: one
+  move: MyString
+
+two:
+  user: two
+  opening: two
+  position: two
+  move: MyString

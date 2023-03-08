@@ -12,10 +12,4 @@ class Lichess
     throw :lichess_error unless response.ok?
     JSON.parse(response.body)
   end
-
-  def self.games(username)
-    response = HTTParty.get()
-
-                 JSON.parse(response.body)
-  end
 end

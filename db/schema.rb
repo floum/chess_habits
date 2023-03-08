@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_16_234544) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -30,6 +30,12 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
     t.datetime "updated_at", null: false
     t.index ["position_id"], name: "index_moves_on_position_id"
     t.index ["user_id"], name: "index_moves_on_user_id"
+  end
+
+  create_table "openings", force: :cascade do |t|
+    t.string "name"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "position_labels", force: :cascade do |t|
@@ -61,6 +67,18 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
     t.index ["user_id"], name: "index_puzzles_on_user_id"
   end
 
+  create_table "repertoire_moves", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "position_id", null: false
+    t.string "move"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.integer "tries"
+    t.integer "successes"
+    t.index ["position_id"], name: "index_repertoire_moves_on_position_id"
+    t.index ["user_id"], name: "index_repertoire_moves_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "name"
     t.datetime "created_at", null: false
@@ -72,4 +90,6 @@ ActiveRecord::Schema[7.0].define(version: 2023_01_21_010833) do
   add_foreign_key "position_labels", "positions"
   add_foreign_key "puzzles", "positions"
   add_foreign_key "puzzles", "users"
+  add_foreign_key "repertoire_moves", "positions"
+  add_foreign_key "repertoire_moves", "users"
 end

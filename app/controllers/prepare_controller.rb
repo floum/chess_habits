@@ -1,8 +1,9 @@
 class PrepareController < ApplicationController
   def index
+    @lichess_game = LichessGame.new
   end
 
-  def import
+  def new
     game = Lichess.fetch(params[:lichess_id])
     if game["players"]["white"]["user"]["name"] == current_user.name
       player_index = 0
@@ -23,11 +24,18 @@ class PrepareController < ApplicationController
       uci = cgame.coord_moves.last
 
       if index % 2 == player_index
-        fens << fen
+        position = Position.find_by(fen: fen)
+        unless position
+          position = Position.create(fen: fen)
+        end
+        @repertoire_move = RepertoireMove.find_by(user: current_user, position: position)
+        unless @repertoire_move
+          @repertoire_move = RepertoireMove.new(position: position, user: current_user)
+          break
+        end
       end
     end
 
-    p fens
-    @position = Position.new(
+    p @repertoire_move
   end
 end

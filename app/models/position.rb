@@ -7,6 +7,10 @@ class Position < ApplicationRecord
   attribute :score, :float, default: 0.0
   attribute :criticality, :float, default: 0.0
 
+  def color
+    fen.split(' ')[1] == 'w' ? :white : :black
+  end
+
   def box?
     score && criticality && (equity - next_best_equity > 0.2)
   end

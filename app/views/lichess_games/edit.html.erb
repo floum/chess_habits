@@ -1,0 +1,8 @@
+<div id="chessboard"></div>
+
+<script type="module">
+  import { Chessgame } from 'chessgame'; 
+  let game = new Chessgame(
+    document.getElementById('chessboard),
+    <%= j @lichess_game.pgn %>
+</script>
